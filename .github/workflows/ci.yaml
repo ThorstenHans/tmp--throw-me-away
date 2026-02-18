@@ -1,0 +1,55 @@
+name: "CI"
+on:
+  push:
+    branches:
+      - "main"
+env:
+  RUST_VERSION: "1.92.0"
+  GO_VERSION: "1.25.7"
+  TINYGO_VERSION: "v0.39.0"
+  NODE_VERSION: "24"
+  PYTHON_VERSION: "3.13.0"
+  SPIN_VERSION: ""
+jobs:
+  spin:
+    runs-on: "ubuntu-latest"
+    name: Build Spin App
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "${{ env.GO_VERSION }}"
+      - name: Install TinyGo
+        uses: rajatjindal/setup-actions/tinygo@v0.0.1
+        with:
+          version: "${{ env.TINYGO_VERSION }}"
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "${{ env.RUST_VERSION }}"
+          targets: wasm32-wasip1
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ env.NODE_VERSION }}"
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+      - name: Install Spin
+        uses: fermyon/actions/spin/setup@v1
+        with:
+          plugins: 
+      - name: Executing Setup Commands for complex
+        run: python3 -m venv venv && source venv/bin/activate
+        working-directory: .
+      - name: Component Dependency Installation
+        run: pip install -r requirements.txt
+        working-directory: ./py-api
+      - name: Build complex
+        run: spin build
+        working-directory: .
+      - name: Executing Teardown Commands for complex
+        run: deactivate
+        working-directory: .

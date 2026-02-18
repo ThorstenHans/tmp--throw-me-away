@@ -1,0 +1,66 @@
+spin_manifest_version = 2
+
+[application]
+name = "complex"
+version = "0.1.0"
+authors = ["Thorsten Hans <thans@akamai.com>"]
+description = ""
+
+[[trigger.http]]
+route = "/rust-api/..."
+component = "rust-api"
+
+[component.rust-api]
+source = "rust-api/target/wasm32-wasip1/release/rust_api.wasm"
+allowed_outbound_hosts = []
+[component.rust-api.build]
+command = "cargo build --target wasm32-wasip1 --release"
+workdir = "rust-api"
+watch = ["src/**/*.rs", "Cargo.toml"]
+
+[[trigger.http]]
+route = "/ts-api/..."
+component = "ts-api"
+
+[component.ts-api]
+source = "ts-api/dist/ts-api.wasm"
+allowed_outbound_hosts = []
+
+[component.ts-api.build]
+command = "npm install && npm run build"
+workdir = "ts-api"
+
+[[trigger.http]]
+route = "/js-api/..."
+component = "js-api"
+
+[component.js-api]
+source = "js-api/dist/js-api.wasm"
+allowed_outbound_hosts = []
+
+[component.js-api.build]
+command = "npm install && npm run build"
+workdir = "js-api"
+
+[[trigger.http]]
+route = "/go-api/..."
+component = "go-api"
+
+[component.go-api]
+source = "go-api/main.wasm"
+allowed_outbound_hosts = []
+[component.go-api.build]
+command = "tinygo build -target=wasip1 -gc=leaking -buildmode=c-shared -no-debug -o main.wasm ."
+workdir = "go-api"
+watch = ["**/*.go", "go.mod"]
+
+[[trigger.http]]
+route = "/py-api/..."
+component = "py-api"
+
+[component.py-api]
+source = "py-api/app.wasm"
+[component.py-api.build]
+command = "componentize-py -w spin-http componentize app -o app.wasm"
+workdir = "py-api"
+watch = ["*.py", "requirements.txt"]
