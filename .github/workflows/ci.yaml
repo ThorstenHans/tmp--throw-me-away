@@ -50,6 +50,3 @@ jobs:
       - name: Build complex
         run: spin build
         working-directory: .
-      - name: Executing Teardown Commands for complex
-        run: deactivate
-        working-directory: .
