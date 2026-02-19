@@ -54,22 +54,22 @@ jobs:
         run: spin plugins update && spin plugins install aka --yes
       - name: Login to Akamai Functions
         run: spin aka login --token ${{ secrets.AKAMAI_FUNCTIONS_TOKEN }}
-      - name: Check if recurring App Deployment (complex)
-        id: check-for-existing-app-complex
+      - name: Check if recurring App Deployment (my-super-complex-app)
+        id: check-for-existing-app-my-super-complex-app
         run: |
-          if spin aka apps list | grep -xF "complex" > /dev/null; then
+          if spin aka apps list | grep -xF "my-super-complex-app" > /dev/null; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "App complex found."
+            echo "App my-super-complex-app found."
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "App complex not found."
+            echo "App my-super-complex-app not found."
           fi
-      - name: Link to existing (complex) App Deployment
-        if: steps.check-for-existing-app-complex.outputs.exists == 'true'
-        run: spin aka app link --app-name complex --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }}
-      - name: Deploying complex to Akamai Functions
-        if: steps.check-for-existing-app-complex.outputs.exists == 'false'
-        run: spin aka deploy --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }} --create-name complex --no-confirm
-      - name: ReDeploying complex to Akamai Functions
-        if: steps.check-for-existing-app-complex.outputs.exists == 'true'
-        run: spin aka deploy --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }} --no-confirm
+      - name: Link to existing (my-super-complex-app) App Deployment
+        if: steps.check-for-existing-app-my-super-complex-app.outputs.exists == 'true'
+        run: spin aka app link --app-name my-super-complex-app --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }}
+      - name: Deploying my-super-complex-app to Akamai Functions
+        if: steps.check-for-existing-app-my-super-complex-app.outputs.exists == 'false'
+        run: spin aka deploy --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }} --create-name my-super-complex-app --no-confirm --skip-readiness-check
+      - name: ReDeploying my-super-complex-app to Akamai Functions
+        if: steps.check-for-existing-app-my-super-complex-app.outputs.exists == 'true'
+        run: spin aka deploy --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }} --no-confirm --skip-readiness-check
