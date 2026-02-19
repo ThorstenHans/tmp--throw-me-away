@@ -10,6 +10,7 @@ env:
   NODE_VERSION: "24"
   PYTHON_VERSION: "3.13.0"
   SPIN_VERSION: ""
+  AKAMAI_FUNCTIONS_DEPLOYMENT_NAME: "foobar"
 jobs:
   spin:
     runs-on: "ubuntu-latest"
@@ -50,3 +51,25 @@ jobs:
       - name: Build complex
         run: spin build
         working-directory: .
+      - name: Install the aka Plugin for Spin
+        run: spin plugins update && spin plugins install aka --yes
+      - name: Login to Akamai Functions
+        run: spin aka login --token ${{ secrets.AKAMAI_FUNCTIONS_TOKEN }}
+      - name: Check if recurring App Deployment
+        id: check-for-existing-app
+        if: inputs.is_recurring_deployment
+        run: |
+          count=$(spin aka app list --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }} | grep ${{ env.AKAMAI_FUNCTIONS_DEPLOYMENT_NAME }} | wc -l)
+          if [ "$count" -eq 0 ]; then
+            echo "ERROR_MESSAGE=App with desired name not found in Akamai Functions account" >> $GITHUB_ENV
+            exit 1
+          fi
+      - name: Link to existing App Deployment
+        if: inputs.is_recurring_deployment
+        run: spin aka app link --app-name ${{ env.AKAMAI_FUNCTIONS_DEPLOYMENT_NAME }} --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }}
+      - name: Recurring Deployment to Akamai Functions
+        if: inputs.is_recurring_deployment
+        run: spin aka deploy --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }} --no-confirm
+      - name: Deploy to Akamai Functions
+        if: inputs.is_recurring_deployment == false
+        run: spin aka deploy --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }} --create-name ${{ env.AKAMAI_FUNCTIONS_DEPLOYMENT_NAME }} --no-confirm
