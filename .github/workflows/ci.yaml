@@ -65,11 +65,11 @@ jobs:
             echo "App complex not found."
           fi
       - name: Link to existing (complex) App Deployment
-        if: steps.check-for-existing-app-complex.exists == 'true'
+        if: steps.check-for-existing-app-complex.outputs.exists == 'true'
         run: spin aka app link --app-name complex --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }}
       - name: Deploying complex to Akamai Functions
-        if: steps.check-for-existing-app-complex.exists == 'false'
+        if: steps.check-for-existing-app-complex.outputs.exists == 'false'
         run: spin aka deploy --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }} --create-name complex --no-confirm
       - name: ReDeploying complex to Akamai Functions
-        if: steps.check-for-existing-app-complex.exists == 'true'
+        if: steps.check-for-existing-app-complex.outputs.exists == 'true'
         run: spin aka deploy --account-id ${{ secrets.AKAMAI_FUNCTIONS_ACCOUNT_ID }} --no-confirm
